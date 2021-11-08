@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'app_logo.dart';
+import 'bluetooth_devices_dialog.dart';
 
 class AppMain extends StatefulWidget {
   const AppMain({Key? key}) : super(key: key);
@@ -23,101 +25,120 @@ class _AppMainState extends State<AppMain> {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [AppLogo()],
-        ),
-        const SizedBox(height: 20),
-        Row(children: [
-          Expanded(
-              child: InputDecorator(
-            decoration: InputDecoration(
-                labelText: '代码',
-                labelStyle: const TextStyle(color: Colors.blue, fontSize: 16.0),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0))),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedCode,
-                isDense: true,
-                style: const TextStyle(color: Colors.black54, fontSize: 16.0),
-                onChanged: (value) => {
-                  setState(() {
-                    _selectedCode = value;
-                  })
-                },
-                items: _codes.entries.map((e) {
-                  return DropdownMenuItem<String>(
-                    value: e.key,
-                    child: Text(e.value),
-                  );
-                }).toList(),
-              ),
-            ),
-          ))
-        ]),
-        const SizedBox(height: 20),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [AppLogo()]),
+        _buildRowSpacing(),
+        Row(children: _buildCodeField()),
+        _buildRowSpacing(),
+        Row(children: _buildBluetoothField()),
+        _buildRowSpacing(),
         Row(
-          children: [
-            Expanded(
-                child: TextField(
-              enabled: false,
-              controller: _selectedDevice,
-              decoration: InputDecoration(
-                  labelText: '选择蓝牙设备',
-                  labelStyle:
-                      const TextStyle(color: Colors.blue, fontSize: 16.0),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0))),
-            )),
-            Container(
-                margin: const EdgeInsets.only(left: 6),
-                height: 50,
-                child: MaterialButton(
-                    elevation: 5,
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    splashColor: Colors.blue,
-                    padding: const EdgeInsets.all(6),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const <Widget>[
-                        Text(
-                          "搜索设备",
-                          style: TextStyle(color: Colors.white, fontSize: 16.0),
-                        ),
-                        Icon(Icons.search),
-                      ],
-                    ),
-                    onPressed: () => {debugPrint('SEARCH BLUETOOTH DEVICES')})),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-                width: 120,
-                height: 50,
-                child: MaterialButton(
-                    elevation: 5,
-                    color: Colors.green,
-                    textColor: Colors.white,
-                    splashColor: Colors.blue,
-                    padding: const EdgeInsets.all(6),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const <Widget>[
-                        Text(
-                          "发 送",
-                          style: TextStyle(color: Colors.white, fontSize: 20.0),
-                        ),
-                        Icon(Icons.upload),
-                      ],
-                    ),
-                    onPressed: () => {debugPrint('SEND DATA')}))
-          ],
-        )
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [_buildSendButton()])
       ],
     );
+  }
+
+  SizedBox _buildRowSpacing() => const SizedBox(height: 20);
+
+  List<Widget> _buildCodeField() {
+    return [
+      Expanded(
+          child: InputDecorator(
+        decoration: InputDecoration(
+            labelText: '代码',
+            labelStyle: const TextStyle(color: Colors.blue, fontSize: 16.0),
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: _selectedCode,
+            isDense: true,
+            style: const TextStyle(color: Colors.black54, fontSize: 16.0),
+            onChanged: (value) => {
+              setState(() {
+                _selectedCode = value;
+              })
+            },
+            items: _codes.entries.map((e) {
+              return DropdownMenuItem<String>(
+                value: e.key,
+                child: Text(e.value),
+              );
+            }).toList(),
+          ),
+        ),
+      ))
+    ];
+  }
+
+  List<Widget> _buildBluetoothField() {
+    return [
+      Expanded(
+          child: TextField(
+        enabled: false,
+        controller: _selectedDevice,
+        decoration: InputDecoration(
+            labelText: '选择蓝牙设备',
+            labelStyle: const TextStyle(color: Colors.blue, fontSize: 16.0),
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+      )),
+      Container(
+          margin: const EdgeInsets.only(left: 6),
+          height: 50,
+          child: MaterialButton(
+              elevation: 5,
+              color: Colors.blue,
+              textColor: Colors.white,
+              splashColor: Colors.blue,
+              padding: const EdgeInsets.all(6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const <Widget>[
+                  Text(
+                    "搜索设备",
+                    style: TextStyle(color: Colors.white, fontSize: 16.0),
+                  ),
+                  Icon(Icons.search),
+                ],
+              ),
+              onPressed: () => showDialog(
+                  context: context,
+                  builder: (builder) => const BluetoothDevicesDialog(),
+                  barrierDismissible: false))),
+    ];
+  }
+
+  SizedBox _buildSendButton() {
+    return SizedBox(
+        width: 120,
+        height: 50,
+        child: MaterialButton(
+            elevation: 5,
+            color: Colors.green,
+            textColor: Colors.white,
+            splashColor: Colors.blue,
+            padding: const EdgeInsets.all(6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const <Widget>[
+                Text(
+                  "发 送",
+                  style: TextStyle(color: Colors.white, fontSize: 20.0),
+                ),
+                Icon(Icons.upload),
+              ],
+            ),
+            onPressed: () => {
+                  Fluttertoast.showToast(
+                      msg: "This is Center Short Toast",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0)
+                }));
   }
 }
