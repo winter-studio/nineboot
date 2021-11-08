@@ -12,15 +12,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: _title,
-        home: Scaffold(
-          appBar: AppBar(title: const Text(_title)),
-          body: Container(
-              margin:
-                  const EdgeInsets.symmetric(vertical: 30, horizontal: 12.0),
-              child: const MyStatefulWidget()),
-        ));
+      debugShowCheckedModeBanner: false,
+      title: _title,
+      home: SafeArea(
+          child: Scaffold(
+        body: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: const MyStatefulWidget()),
+      )),
+    );
   }
 }
 
@@ -43,6 +43,27 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              children: const [
+                Icon(
+                  Icons.run_circle,
+                  color: Colors.blueGrey,
+                  size: 120,
+                ),
+                Text(
+                  'NineBoot',
+                  style: TextStyle(color: Colors.blueGrey, fontSize: 30.0),
+                )
+              ],
+            )
+          ],
+        ),
+        const SizedBox(
+          height: 20,
+        ),
         Row(children: [
           Expanded(
               child: InputDecorator(
