@@ -13,25 +13,28 @@ class BluetoothDevicesDialog extends StatefulWidget {
 }
 
 class _BluetoothList extends State<BluetoothDevicesDialog> {
-  FlutterBlue flutterBlue = FlutterBlue.instance;
-
+  final FlutterBlue flutterBlue = FlutterBlue.instance;
   final LinkedHashSet<ScanResult> scanResultSet = LinkedHashSet();
   final List<ScanResult> scanResults = [];
   BluetoothDevice? _selected;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
+    flutterBlue.startScan(timeout: const Duration(seconds: 5));
+
     flutterBlue.scanResults.listen((results) {
       // do something with scan results
       for (ScanResult r in results) {
-        if(!scanResultSet.contains(r)){
-          scanResultSet.add(r);
-          scanResults.add(r);
+        if (!scanResultSet.contains(r)) {
+          setState(() {
+            scanResultSet.add(r);
+            scanResults.add(r);
+          });
         }
       }
+      debugPrint(scanResults.length.toString());
     });
-
-    flutterBlue.startScan(timeout: const Duration(seconds: 5));
 
     return AlertDialog(
       title: const Text('蓝牙列表'),
@@ -91,16 +94,19 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
                           maxHeight: MediaQuery.of(context).size.height * 0.6,
                         ),
                         child: ListView.builder(
+                            key: UniqueKey(),
                             shrinkWrap: true,
                             itemCount: scanResults.length,
                             itemBuilder: (BuildContext context, int index) {
                               return RadioListTile(
+                                  key: UniqueKey(),
                                   title: _buildBluetoothItem(index),
                                   value: index,
                                   groupValue: _selected,
                                   onChanged: (value) => {
                                         setState(() => {
-                                              _selected = scanResults[index].device
+                                              _selected =
+                                                  scanResults[index].device
                                             })
                                       });
                             }),
