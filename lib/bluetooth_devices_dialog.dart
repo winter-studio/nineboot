@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -13,20 +15,23 @@ class BluetoothDevicesDialog extends StatefulWidget {
 class _BluetoothList extends State<BluetoothDevicesDialog> {
   FlutterBlue flutterBlue = FlutterBlue.instance;
 
-  final List<BluetoothDevice> devices = [];
-
-  var _selected;
+  final LinkedHashSet<ScanResult> scanResultSet = LinkedHashSet();
+  final List<ScanResult> scanResults = [];
+  BluetoothDevice? _selected;
 
   @override
   Widget build(BuildContext context) {
     flutterBlue.scanResults.listen((results) {
       // do something with scan results
       for (ScanResult r in results) {
-        print('${r.device.name} found! rssi: ${r.rssi}');
+        if(!scanResultSet.contains(r)){
+          scanResultSet.add(r);
+          scanResults.add(r);
+        }
       }
     });
 
-    flutterBlue.startScan(timeout: const Duration(seconds: 15));
+    flutterBlue.startScan(timeout: const Duration(seconds: 5));
 
     return AlertDialog(
       title: const Text('蓝牙列表'),
@@ -35,12 +40,21 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
       buttonPadding: EdgeInsets.zero,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20))),
-      actionsAlignment: MainAxisAlignment.center,
+      actionsAlignment: MainAxisAlignment.spaceEvenly,
       actions: [
         TextButton(
           child: const Text(
-            '确 定',
-            style: TextStyle(fontSize: 16),
+            '取消',
+            style: TextStyle(fontSize: 18, color: Colors.red),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: const Text(
+            '确定',
+            style: TextStyle(fontSize: 18),
           ),
           onPressed: () {
             //widget.onOk();
@@ -51,8 +65,7 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
                 timeInSecForIosWeb: 1,
                 backgroundColor: Colors.red,
                 textColor: Colors.white,
-                fontSize: 16.0
-            );
+                fontSize: 16.0);
             // Navigator.pop(context);
           },
         ),
@@ -75,23 +88,21 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
                       ),
                       ConstrainedBox(
                         constraints: BoxConstraints(
-                          maxHeight: MediaQuery
-                              .of(context)
-                              .size
-                              .height * 0.6,
+                          maxHeight: MediaQuery.of(context).size.height * 0.6,
                         ),
                         child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: devices.length,
+                            itemCount: scanResults.length,
                             itemBuilder: (BuildContext context, int index) {
                               return RadioListTile(
-                                  title: Text(devices[index].id.id),
+                                  title: _buildBluetoothItem(index),
                                   value: index,
                                   groupValue: _selected,
-                                  onChanged: (value) =>
-                                  {
-                                    setState(() => {_selected = value})
-                                  });
+                                  onChanged: (value) => {
+                                        setState(() => {
+                                              _selected = scanResults[index].device
+                                            })
+                                      });
                             }),
                       ),
                       const Divider(
@@ -105,4 +116,18 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
     );
   }
 
+  Widget _buildBluetoothItem(int index) {
+    ScanResult scanResult = scanResults[index];
+    return Column(
+      children: [
+        Text(scanResult.device.name.isEmpty ? '#NA' : scanResult.device.name),
+        Row(
+          children: [
+            Text(scanResult.device.id.id),
+            Text("${scanResult.rssi}db"),
+          ],
+        )
+      ],
+    );
+  }
 }
