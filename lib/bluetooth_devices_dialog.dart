@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class BluetoothDevicesDialog extends StatefulWidget {
@@ -10,12 +11,23 @@ class BluetoothDevicesDialog extends StatefulWidget {
 }
 
 class _BluetoothList extends State<BluetoothDevicesDialog> {
-  final devices = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  FlutterBlue flutterBlue = FlutterBlue.instance;
+
+  final List<BluetoothDevice> devices = [];
 
   var _selected;
 
   @override
   Widget build(BuildContext context) {
+    flutterBlue.scanResults.listen((results) {
+      // do something with scan results
+      for (ScanResult r in results) {
+        print('${r.device.name} found! rssi: ${r.rssi}');
+      }
+    });
+
+    flutterBlue.startScan(timeout: const Duration(seconds: 15));
+
     return AlertDialog(
       title: const Text('蓝牙列表'),
       titleTextStyle: const TextStyle(color: Colors.blue, fontSize: 18),
@@ -73,7 +85,7 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
                             itemCount: devices.length,
                             itemBuilder: (BuildContext context, int index) {
                               return RadioListTile(
-                                  title: Text(devices[index]),
+                                  title: Text(devices[index].id.id),
                                   value: index,
                                   groupValue: _selected,
                                   onChanged: (value) =>
@@ -92,4 +104,5 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
                   )))),
     );
   }
+
 }
