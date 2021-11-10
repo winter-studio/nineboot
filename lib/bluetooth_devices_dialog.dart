@@ -21,6 +21,11 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      scanResultSet.clear();
+      scanResults.clear();
+    });
+
     flutterBlue.startScan(timeout: const Duration(seconds: 5));
 
     flutterBlue.scanResults.listen((results) {
@@ -126,11 +131,24 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
     ScanResult scanResult = scanResults[index];
     return Column(
       children: [
-        Text(scanResult.device.name.isEmpty ? '#NA' : scanResult.device.name),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(scanResult.device.id.id),
-            Text("${scanResult.rssi}db"),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                scanResult.device.name.isEmpty
+                    ? '未知设备'
+                    : scanResult.device.name,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              Text(scanResult.device.id.id),
+            ]),
+            Column(
+              children: [
+                const Icon(Icons.signal_cellular_alt),
+                Text("${scanResult.rssi}db"),
+              ],
+            )
           ],
         )
       ],
