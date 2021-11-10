@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-const assetsImagePath = "images/logo.png";
+const assetsImagePath = "assets/images/logo.png";
 
 class AppLogo extends StatelessWidget {
   const AppLogo({
