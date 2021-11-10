@@ -112,33 +112,35 @@ class _AppMainState extends State<AppMain> {
 
   SizedBox _buildSendButton() {
     return SizedBox(
-        width: 120,
-        height: 50,
+        width: 150,
+        height: 150,
         child: MaterialButton(
             elevation: 5,
             color: Colors.green,
             textColor: Colors.white,
             splashColor: Colors.blue,
             padding: const EdgeInsets.all(6),
+            shape: const CircleBorder(),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: const <Widget>[
                 Text(
                   "发 送",
-                  style: TextStyle(color: Colors.white, fontSize: 20.0),
+                  style: TextStyle(color: Colors.white, fontSize: 46.0),
                 ),
-                Icon(Icons.upload),
               ],
             ),
             onPressed: () => {
-                  Fluttertoast.showToast(
-                      msg: "This is Center Short Toast",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0)
+                  if (_selectedDevice.value.text.isEmpty){
+                      Fluttertoast.showToast(
+                          msg: "请先搜索并选择设备",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 18.0)
+                    }
                 }));
   }
 }

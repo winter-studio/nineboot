@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,23 +22,28 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
   StreamSubscription<List<ScanResult>>? scanSubscription;
   ScanResult? selectedDevice;
   bool isLoading = false;
+  Stream<bool>? isScanning;
 
   @override
   void dispose() {
     _stopScan();
+    isScanning = null;
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    flutterBlue.isScanning.listen((event) {
-      setState(() {
-        log(event.toString());
-        isLoading = event;
-      });
+    isScanning = flutterBlue.isScanning;
+    isScanning?.listen((event) {
+      if (event != isLoading && mounted) {
+        setState(() {
+          log(event.toString());
+          isLoading = event;
+        });
+      }
     });
-    _startScan(10);
+    _startScan();
   }
 
   void _stopScan() {
@@ -83,7 +89,7 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
                 ),
           onPressed: () {
             if (!isLoading) {
-              _startScan(5);
+              _startScan();
             }
           },
         ),
@@ -93,22 +99,25 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
             style: TextStyle(fontSize: 18),
           ),
           onPressed: () {
-            //widget.onOk();
-            Fluttertoast.showToast(
-                msg: "This is Center Short Toast",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.CENTER,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0);
-            // Navigator.pop(context);
+            if (selectedDevice == null) {
+              Fluttertoast.showToast(
+                  msg: "请选择设备",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 18.0);
+            } else {
+              Navigator.pop(context);
+            }
           },
         ),
       ],
       content: Scrollbar(
+          controller: ScrollController(),
           isAlwaysShown: true,
-          thickness: 2,
+          thickness: 3,
           child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: SizedBox(
@@ -150,20 +159,17 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
     );
   }
 
-  void _startScan(int durationInSecond) {
+  void _startScan() {
     log("start scan");
     setState(() {
+      selectedDevice = null;
       isLoading = true;
     });
-    flutterBlue.startScan(timeout: Duration(seconds: durationInSecond));
+    flutterBlue.startScan(timeout: const Duration(seconds: 20));
 
     scanSubscription = flutterBlue.scanResults.listen((results) {
       setState(() {
-        for (var result in results) {
-          if (!scanResults.contains(result)) {
-            scanResults.add(result);
-          }
-        }
+        scanResults = results.toList();
       });
 
       log(scanResults.toString());
@@ -188,13 +194,43 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
             ]),
             Column(
               children: [
-                const Icon(Icons.signal_cellular_alt),
-                Text("${scanResult.rssi}db"),
+                _buildSignalIcon(scanResult.rssi),
               ],
             )
           ],
         )
       ],
+    );
+  }
+
+  Widget _buildSignalIcon(int rssi) {
+    int emptyBlock = (0 - rssi - 60) % 7;
+    emptyBlock = math.min(emptyBlock, 5);
+    List<Container> blocks = [];
+
+    for (int i = 0; i < 5 - emptyBlock; i++) {
+      blocks.add(Container(
+        color: Colors.blueGrey,
+        width: 4,
+        height: i * 4 + 6,
+      ));
+    }
+    for (int i = 5 - emptyBlock; i < 5; i++) {
+      blocks.add(Container(
+        decoration: BoxDecoration(border: Border.all(color: Colors.blueGrey)),
+        width: 4,
+        height: i * 4 + 6,
+      ));
+    }
+
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: blocks,
+      ),
     );
   }
 }
