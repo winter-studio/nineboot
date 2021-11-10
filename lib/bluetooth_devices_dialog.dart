@@ -21,11 +21,7 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      scanResultSet.clear();
-      scanResults.clear();
-    });
-
+    // TODO use a timer to scan devices
     flutterBlue.startScan(timeout: const Duration(seconds: 5));
 
     flutterBlue.scanResults.listen((results) {
