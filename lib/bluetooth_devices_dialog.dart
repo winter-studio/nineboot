@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,29 +17,32 @@ class BluetoothDevicesDialog extends StatefulWidget {
 
 class _BluetoothList extends State<BluetoothDevicesDialog> {
   final FlutterBlue flutterBlue = FlutterBlue.instance;
-  final LinkedHashSet<ScanResult> scanResultSet = LinkedHashSet();
-  final List<ScanResult> scanResults = [];
-  BluetoothDevice? _selected;
+  LinkedHashSet<ScanResult> scanResults = LinkedHashSet();
+  StreamSubscription<List<ScanResult>>? scanSubscription;
+  ScanResult? selectedDevice;
   bool isLoading = false;
 
   @override
+  void dispose() {
+    _stopScan();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _startScan();
+  }
+
+  void _stopScan() {
+    log("stop scan");
+    flutterBlue.stopScan();
+    scanSubscription?.cancel();
+    scanSubscription = null;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // TODO use a timer to scan devices
-    flutterBlue.startScan(timeout: const Duration(seconds: 5));
-
-    flutterBlue.scanResults.listen((results) {
-      // do something with scan results
-      for (ScanResult r in results) {
-        if (!scanResultSet.contains(r)) {
-          setState(() {
-            scanResultSet.add(r);
-            scanResults.add(r);
-          });
-        }
-      }
-      debugPrint(scanResults.length.toString());
-    });
-
     return AlertDialog(
       title: const Text('蓝牙列表'),
       titleTextStyle: const TextStyle(color: Colors.blue, fontSize: 18),
@@ -95,21 +101,16 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
                           maxHeight: MediaQuery.of(context).size.height * 0.6,
                         ),
                         child: ListView.builder(
-                            key: UniqueKey(),
                             shrinkWrap: true,
                             itemCount: scanResults.length,
                             itemBuilder: (BuildContext context, int index) {
                               return RadioListTile(
-                                  key: UniqueKey(),
                                   title: _buildBluetoothItem(index),
-                                  value: index,
-                                  groupValue: _selected,
-                                  onChanged: (value) => {
-                                        setState(() => {
-                                              _selected =
-                                                  scanResults[index].device
-                                            })
-                                      });
+                                  value: scanResults.elementAt(index),
+                                  groupValue: selectedDevice,
+                                  onChanged: (value) => setState(() {
+                                        selectedDevice = value as ScanResult?;
+                                      }));
                             }),
                       ),
                       const Divider(
@@ -123,8 +124,22 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
     );
   }
 
+  void _startScan() {
+    log("start scan");
+
+    flutterBlue.startScan(timeout: const Duration(seconds: 4));
+
+    scanSubscription = flutterBlue.scanResults.listen((results) {
+      setState(() {
+        scanResults.addAll(results.toSet());
+      });
+
+      log(jsonEncode(scanResults).toString());
+    }, onDone: () => {_stopScan()});
+  }
+
   Widget _buildBluetoothItem(int index) {
-    ScanResult scanResult = scanResults[index];
+    ScanResult scanResult = scanResults.elementAt(index);
     return Column(
       children: [
         Row(
