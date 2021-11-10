@@ -17,7 +17,7 @@ class BluetoothDevicesDialog extends StatefulWidget {
 
 class _BluetoothList extends State<BluetoothDevicesDialog> {
   final FlutterBlue flutterBlue = FlutterBlue.instance;
-  LinkedHashSet<ScanResult> scanResults = LinkedHashSet();
+  List<ScanResult> scanResults = [];
   StreamSubscription<List<ScanResult>>? scanSubscription;
   ScanResult? selectedDevice;
   bool isLoading = false;
@@ -31,7 +31,13 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
   @override
   void initState() {
     super.initState();
-    _startScan();
+    flutterBlue.isScanning.listen((event) {
+      setState(() {
+        log(event.toString());
+        isLoading = event;
+      });
+    });
+    _startScan(10);
   }
 
   void _stopScan() {
@@ -59,6 +65,26 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
           ),
           onPressed: () {
             Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: isLoading
+              ? Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  width: 24,
+                  height: 24,
+                  child: const CircularProgressIndicator(
+                    color: Colors.green,
+                  ),
+                )
+              : const Text(
+                  '重新扫描',
+                  style: TextStyle(fontSize: 18, color: Colors.green),
+                ),
+          onPressed: () {
+            if (!isLoading) {
+              _startScan(5);
+            }
           },
         ),
         TextButton(
@@ -106,7 +132,7 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
                             itemBuilder: (BuildContext context, int index) {
                               return RadioListTile(
                                   title: _buildBluetoothItem(index),
-                                  value: scanResults.elementAt(index),
+                                  value: scanResults[index],
                                   groupValue: selectedDevice,
                                   onChanged: (value) => setState(() {
                                         selectedDevice = value as ScanResult?;
@@ -124,22 +150,28 @@ class _BluetoothList extends State<BluetoothDevicesDialog> {
     );
   }
 
-  void _startScan() {
+  void _startScan(int durationInSecond) {
     log("start scan");
-
-    flutterBlue.startScan(timeout: const Duration(seconds: 4));
+    setState(() {
+      isLoading = true;
+    });
+    flutterBlue.startScan(timeout: Duration(seconds: durationInSecond));
 
     scanSubscription = flutterBlue.scanResults.listen((results) {
       setState(() {
-        scanResults.addAll(results.toSet());
+        for (var result in results) {
+          if (!scanResults.contains(result)) {
+            scanResults.add(result);
+          }
+        }
       });
 
-      log(jsonEncode(scanResults).toString());
+      log(scanResults.toString());
     }, onDone: () => {_stopScan()});
   }
 
   Widget _buildBluetoothItem(int index) {
-    ScanResult scanResult = scanResults.elementAt(index);
+    ScanResult scanResult = scanResults[index];
     return Column(
       children: [
         Row(
