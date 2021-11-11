@@ -167,7 +167,7 @@ class _AppMainState extends State<AppMain> {
         c.write(hex.decode(_selectedCode!));
       } on StateError catch (e) {
         log(e.message);
-        _showErrorToast("该设备不是九号车");
+        _showErrorToast("无法送达代码到该设备");
       }
     } else {
       _showErrorToast("请先搜索并选择设备");
