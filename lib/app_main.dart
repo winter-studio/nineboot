@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'app_logo.dart';
@@ -18,7 +19,8 @@ class _AppMainState extends State<AppMain> {
     '5AA500324357736C4C54413872': '(新代码)5AA500324357736C4C54413872'
   };
   String? _selectedCode = '5AA5007057457776656E467A39';
-  final _selectedDevice = TextEditingController();
+  BluetoothDevice? selectedDevice;
+  final _selectedDeviceId = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +79,7 @@ class _AppMainState extends State<AppMain> {
       Expanded(
           child: TextField(
         enabled: false,
-        controller: _selectedDevice,
+        controller: _selectedDeviceId,
         decoration: InputDecoration(
             labelText: '选择蓝牙设备',
             labelStyle: const TextStyle(color: Colors.blue, fontSize: 16.0),
@@ -103,10 +105,20 @@ class _AppMainState extends State<AppMain> {
                   Icon(Icons.search),
                 ],
               ),
-              onPressed: () => showDialog(
-                  context: context,
-                  builder: (builder) => const BluetoothDevicesDialog(),
-                  barrierDismissible: false))),
+              onPressed: () async {
+                showDialog(
+                        context: context,
+                        builder: (builder) => const BluetoothDevicesDialog(),
+                        barrierDismissible: false)
+                    .then((value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedDevice = value;
+                      _selectedDeviceId.text = selectedDevice!.id.id;
+                    });
+                  }
+                });
+              })),
     ];
   }
 
@@ -131,7 +143,13 @@ class _AppMainState extends State<AppMain> {
               ],
             ),
             onPressed: () => {
-                  if (_selectedDevice.value.text.isEmpty){
+                  if (selectedDevice != null)
+                    {
+                      selectedDevice!
+                          .connect(timeout: const Duration(seconds: 10))
+                    }
+                  else
+                    {
                       Fluttertoast.showToast(
                           msg: "请先搜索并选择设备",
                           toastLength: Toast.LENGTH_SHORT,

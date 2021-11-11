@@ -74,12 +74,22 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
         ),
         TextButton(
           child: isLoading
-              ? Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  width: 24,
-                  height: 24,
-                  child: const CircularProgressIndicator(
-                    color: Colors.green,
+              ? SizedBox(
+                  width: 120,
+                  child: Column(
+                    children: const [
+                      Text(
+                        '停止扫描',
+                        style:
+                            TextStyle(fontSize: 18, color: Colors.deepOrange),
+                      ),
+                      SizedBox(
+                          width: 70,
+                          height: 3,
+                          child: LinearProgressIndicator(
+                            color: Colors.deepOrange,
+                          ))
+                    ],
                   ),
                 )
               : const Text(
@@ -87,7 +97,9 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
                   style: TextStyle(fontSize: 18, color: Colors.green),
                 ),
           onPressed: () {
-            if (!isLoading) {
+            if (isLoading) {
+              _stopScan();
+            } else {
               _startScan();
             }
           },
@@ -108,7 +120,7 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
                   textColor: Colors.white,
                   fontSize: 18.0);
             } else {
-              Navigator.pop(context);
+              Navigator.pop(context, selectedDevice?.device);
             }
           },
         ),
@@ -132,6 +144,7 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
                       ),
                       ConstrainedBox(
                         constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height * 0.6,
                           maxHeight: MediaQuery.of(context).size.height * 0.6,
                         ),
                         child: ListView.builder(
@@ -164,14 +177,12 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
       selectedDevice = null;
       isLoading = true;
     });
-    flutterBlue.startScan(timeout: const Duration(seconds: 20));
+    flutterBlue.startScan();
 
     scanSubscription = flutterBlue.scanResults.listen((results) {
       setState(() {
         scanResults = results.toList();
       });
-
-      log(scanResults.toString());
     }, onDone: () => {_stopScan()});
   }
 
