@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:collection';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +12,10 @@ class BluetoothDevicesDialog extends StatefulWidget {
   const BluetoothDevicesDialog({Key? key}) : super(key: key);
 
   @override
-  _BluetoothList createState() => _BluetoothList();
+  _BluetoothListState createState() => _BluetoothListState();
 }
 
-class _BluetoothList extends State<BluetoothDevicesDialog> {
+class _BluetoothListState extends State<BluetoothDevicesDialog> {
   final FlutterBlue flutterBlue = FlutterBlue.instance;
   List<ScanResult> scanResults = [];
   StreamSubscription<List<ScanResult>>? scanSubscription;
