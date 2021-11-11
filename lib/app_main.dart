@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:convert/convert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -14,6 +17,10 @@ class AppMain extends StatefulWidget {
 }
 
 class _AppMainState extends State<AppMain> {
+  static const String serviceId = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+  static const String characteristicsId =
+      "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+
   final Map<String, String> _codes = {
     '5AA5007057457776656E467A39': '(旧代码)5AA5007057457776656E467A39',
     '5AA500324357736C4C54413872': '(新代码)5AA500324357736C4C54413872'
@@ -142,23 +149,39 @@ class _AppMainState extends State<AppMain> {
                 ),
               ],
             ),
-            onPressed: () => {
-                  if (selectedDevice != null)
-                    {
-                      selectedDevice!
-                          .connect(timeout: const Duration(seconds: 10))
-                    }
-                  else
-                    {
-                      Fluttertoast.showToast(
-                          msg: "请先搜索并选择设备",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 18.0)
-                    }
-                }));
+            onPressed: () => _sendData()));
+  }
+
+  Future<void> _sendData() async {
+    if (selectedDevice != null) {
+      await selectedDevice!.connect(timeout: const Duration(seconds: 10));
+      List<BluetoothService> services =
+          await selectedDevice!.discoverServices();
+      try {
+        BluetoothCharacteristic c = services
+            .firstWhere(
+                (service) => service.uuid.toString().toLowerCase() == serviceId)
+            .characteristics
+            .firstWhere(
+                (c) => c.uuid.toString().toLowerCase() == characteristicsId);
+        c.write(hex.decode(_selectedCode!));
+      } on StateError catch (e) {
+        log(e.message);
+        _showErrorToast("该设备不是九号车");
+      }
+    } else {
+      _showErrorToast("请先搜索并选择设备");
+    }
+  }
+
+  void _showErrorToast(msg) {
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 18.0);
   }
 }
