@@ -28,6 +28,7 @@ class _AppMainState extends State<AppMain> {
   String? _selectedCode = '5AA5007057457776656E467A39';
   BluetoothDevice? selectedDevice;
   final _selectedDeviceId = TextEditingController();
+  bool sending = false;
 
   @override
   Widget build(BuildContext context) {
@@ -133,45 +134,66 @@ class _AppMainState extends State<AppMain> {
     return SizedBox(
         width: 150,
         height: 150,
-        child: MaterialButton(
-            elevation: 5,
-            color: Colors.green,
-            textColor: Colors.white,
-            splashColor: Colors.blue,
-            padding: const EdgeInsets.all(6),
-            shape: const CircleBorder(),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
-                Text(
-                  "发 送",
-                  style: TextStyle(color: Colors.white, fontSize: 46.0),
+        child: sending
+            ? const CircularProgressIndicator(
+                color: Colors.orange,
+                strokeWidth: 8,
+              )
+            : MaterialButton(
+                elevation: 5,
+                color: Colors.green,
+                textColor: Colors.white,
+                splashColor: Colors.blue,
+                padding: const EdgeInsets.all(6),
+                shape: const CircleBorder(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const <Widget>[
+                    Text(
+                      "发 送",
+                      style: TextStyle(color: Colors.white, fontSize: 46.0),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            onPressed: () => _sendData()));
+                onPressed: () => _sendData()));
   }
 
   Future<void> _sendData() async {
+    _updateSendingState(true);
     if (selectedDevice != null) {
-      await selectedDevice!.connect(timeout: const Duration(seconds: 10));
-      List<BluetoothService> services =
-          await selectedDevice!.discoverServices();
-      try {
-        BluetoothCharacteristic c = services
-            .firstWhere(
-                (service) => service.uuid.toString().toLowerCase() == serviceId)
-            .characteristics
-            .firstWhere(
-                (c) => c.uuid.toString().toLowerCase() == characteristicsId);
-        c.write(hex.decode(_selectedCode!));
-      } on StateError catch (e) {
-        log(e.message);
-        _showErrorToast("无法送达代码到该设备");
-      }
+      selectedDevice!.connect().then((value) {
+        log('连接成功');
+        selectedDevice!.discoverServices().then((services) {
+          try {
+            BluetoothCharacteristic c = services
+                .firstWhere((service) =>
+                    service.uuid.toString().toLowerCase() == serviceId)
+                .characteristics
+                .firstWhere((c) =>
+                    c.uuid.toString().toLowerCase() == characteristicsId);
+            c.write(hex.decode(_selectedCode!));
+          } on StateError catch (e) {
+            log(e.message);
+            _showErrorToast("无法送达代码到该设备");
+          } finally {
+            _updateSendingState(false);
+          }
+        }).whenComplete(() => setState(() {
+              sending = false;
+            }));
+      }).timeout(const Duration(seconds: 10), onTimeout: () {
+        _showErrorToast("连接设备超时");
+        _updateSendingState(false);
+      });
     } else {
       _showErrorToast("请先搜索并选择设备");
     }
+  }
+
+  void _updateSendingState(state) {
+    setState(() {
+      sending = state;
+    });
   }
 
   void _showErrorToast(msg) {

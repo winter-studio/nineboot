@@ -22,6 +22,7 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
   ScanResult? selectedDevice;
   bool isLoading = false;
   Stream<bool>? isScanning;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
@@ -75,27 +76,27 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
         TextButton(
           child: isLoading
               ? SizedBox(
-                  width: 120,
-                  child: Column(
-                    children: const [
-                      Text(
-                        '停止扫描',
-                        style:
-                            TextStyle(fontSize: 18, color: Colors.deepOrange),
-                      ),
-                      SizedBox(
-                          width: 70,
-                          height: 3,
-                          child: LinearProgressIndicator(
-                            color: Colors.deepOrange,
-                          ))
-                    ],
-                  ),
-                )
-              : const Text(
-                  '重新扫描',
-                  style: TextStyle(fontSize: 18, color: Colors.green),
+            width: 120,
+            child: Column(
+              children: const [
+                Text(
+                  '停止扫描',
+                  style:
+                  TextStyle(fontSize: 18, color: Colors.deepOrange),
                 ),
+                SizedBox(
+                    width: 70,
+                    height: 3,
+                    child: LinearProgressIndicator(
+                      color: Colors.deepOrange,
+                    ))
+              ],
+            ),
+          )
+              : const Text(
+            '重新扫描',
+            style: TextStyle(fontSize: 18, color: Colors.green),
+          ),
           onPressed: () {
             if (isLoading) {
               _stopScan();
@@ -126,11 +127,12 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
         ),
       ],
       content: Scrollbar(
-          controller: ScrollController(),
+          controller: _scrollController,
           isAlwaysShown: true,
           thickness: 3,
           child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
+              controller:_scrollController,
               child: SizedBox(
                   width: double.maxFinite,
                   child: Column(
@@ -144,8 +146,14 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
                       ),
                       ConstrainedBox(
                         constraints: BoxConstraints(
-                          minHeight: MediaQuery.of(context).size.height * 0.6,
-                          maxHeight: MediaQuery.of(context).size.height * 0.6,
+                          minHeight: MediaQuery
+                              .of(context)
+                              .size
+                              .height * 0.6,
+                          maxHeight: MediaQuery
+                              .of(context)
+                              .size
+                              .height * 0.6,
                         ),
                         child: ListView.builder(
                             shrinkWrap: true,
@@ -155,7 +163,8 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
                                   title: _buildBluetoothItem(index),
                                   value: scanResults[index],
                                   groupValue: selectedDevice,
-                                  onChanged: (value) => setState(() {
+                                  onChanged: (value) =>
+                                      setState(() {
                                         selectedDevice = value as ScanResult?;
                                       }));
                             }),
