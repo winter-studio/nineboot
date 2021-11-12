@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:nineboot/app_main.dart';
+
+import 'app_content.dart';
+import 'app_logo.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,9 +19,9 @@ class MyApp extends StatelessWidget {
       title: _title,
       home: SafeArea(
           child: Scaffold(
-        body: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: const AppMain()),
+        body: Column(
+          children: const [AppLogo(), AppContent()],
+        ),
       )),
     );
   }

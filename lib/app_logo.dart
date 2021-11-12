@@ -1,44 +1,45 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rive/rive.dart';
 
 const assetsImagePath = "assets/images/logo.png";
+const assetsAnimationBike = "assets/animation/bike.riv";
 
-class AppLogo extends StatelessWidget {
-  const AppLogo({
-    Key? key,
-  }) : super(key: key);
+class AppLogo extends StatefulWidget {
+  const AppLogo({Key? key}) : super(key: key);
+
+  @override
+  _AppLogoState createState() => _AppLogoState();
+}
+
+class _AppLogoState extends State<AppLogo> {
+  double _height = 0;
+  final StateMachineController _controller =
+      StateMachineController(StateMachine());
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          _loadFromAssets(),
-          const Text(
+    return Column(
+      children: [
+        SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: _height,
+            child: RiveAnimation.asset(assetsAnimationBike,
+                fit: BoxFit.fitWidth,
+                controllers: [_controller],
+                stateMachines: const ["press"],
+                onInit: (Artboard artboard) => {
+                      setState(() {
+                        _height = artboard.height;
+                      })
+                    })),
+        Container(
+          margin: const EdgeInsets.only(top: 16),
+          child: const Text(
             'NineBoot',
-            style: TextStyle(color: Colors.blueGrey, fontSize: 36.0),
-          )
-        ],
-      ),
+            style: TextStyle(fontSize: 50, color: Colors.black54),
+          ),
+        ),
+      ],
     );
   }
-
-  Widget _loadFromAssets() => Container(
-      width: 120,
-      height: 120,
-      alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.black26,
-      ),
-      child: SizedBox(
-        height: 80,
-        width: 80,
-        child: Image.asset(
-          assetsImagePath,
-        ),
-      ));
 }

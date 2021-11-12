@@ -7,17 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'app_logo.dart';
 import 'bluetooth_devices_dialog.dart';
 
-class AppMain extends StatefulWidget {
-  const AppMain({Key? key}) : super(key: key);
+class AppContent extends StatefulWidget {
+  const AppContent({Key? key}) : super(key: key);
 
   @override
-  State<AppMain> createState() => _AppMainState();
+  State<AppContent> createState() => _AppContentState();
 }
 
-class _AppMainState extends State<AppMain> {
+class _AppContentState extends State<AppContent> {
   static const String _ninebotServiceId =
       "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
   static const String _ninebotCharacteristicsId =
@@ -34,20 +33,11 @@ class _AppMainState extends State<AppMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [AppLogo()]),
-        _buildRowSpacing(),
-        Row(children: _buildCodeField()),
-        _buildRowSpacing(),
-        Row(children: _buildBluetoothField()),
-        _buildRowSpacing(),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [_buildSendButton()])
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: _buildFields(),
+      ),
     );
   }
 
@@ -205,5 +195,18 @@ class _AppMainState extends State<AppMain> {
         backgroundColor: Colors.red,
         textColor: Colors.white,
         fontSize: 18.0);
+  }
+
+  List<Widget> _buildFields() {
+    return [
+      _buildRowSpacing(),
+      Row(children: _buildCodeField()),
+      _buildRowSpacing(),
+      Row(children: _buildBluetoothField()),
+      _buildRowSpacing(),
+      Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [_buildSendButton()])
+    ];
   }
 }
