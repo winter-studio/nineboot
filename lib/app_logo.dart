@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
 
@@ -18,10 +20,12 @@ class _AppLogoState extends State<AppLogo> {
 
   @override
   Widget build(BuildContext context) {
+    var mediaWidth = MediaQuery.of(context).size.width;
+
     return Column(
       children: [
         SizedBox(
-            width: MediaQuery.of(context).size.width,
+            width: mediaWidth,
             height: _height,
             child: RiveAnimation.asset(assetsAnimationBike,
                 fit: BoxFit.fitWidth,
@@ -29,7 +33,10 @@ class _AppLogoState extends State<AppLogo> {
                 stateMachines: const ["press"],
                 onInit: (Artboard artboard) => {
                       setState(() {
-                        _height = artboard.height;
+                        log(artboard.width.toString());
+                        log(artboard.height.toString());
+
+                        _height = mediaWidth * artboard.height/ artboard.width;
                       })
                     })),
         Container(
