@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:convert/convert.dart';
@@ -17,8 +18,9 @@ class AppMain extends StatefulWidget {
 }
 
 class _AppMainState extends State<AppMain> {
-  static const String serviceId = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-  static const String characteristicsId =
+  static const String _ninebotServiceId =
+      "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+  static const String _ninebotCharacteristicsId =
       "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
 
   final Map<String, String> _codes = {
@@ -26,9 +28,9 @@ class _AppMainState extends State<AppMain> {
     '5AA500324357736C4C54413872': '(新代码)5AA500324357736C4C54413872'
   };
   String? _selectedCode = '5AA5007057457776656E467A39';
-  BluetoothDevice? selectedDevice;
+  BluetoothDevice? _selectedDevice;
   final _selectedDeviceId = TextEditingController();
-  bool sending = false;
+  bool _isSending = false;
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +123,8 @@ class _AppMainState extends State<AppMain> {
                     .then((value) {
                   if (value != null) {
                     setState(() {
-                      selectedDevice = value;
-                      _selectedDeviceId.text = selectedDevice!.id.id;
+                      _selectedDevice = value;
+                      _selectedDeviceId.text = _selectedDevice!.id.id;
                     });
                   }
                 });
@@ -134,7 +136,7 @@ class _AppMainState extends State<AppMain> {
     return SizedBox(
         width: 150,
         height: 150,
-        child: sending
+        child: _isSending
             ? const CircularProgressIndicator(
                 color: Colors.orange,
                 strokeWidth: 8,
@@ -159,32 +161,30 @@ class _AppMainState extends State<AppMain> {
   }
 
   Future<void> _sendData() async {
-    _updateSendingState(true);
-    if (selectedDevice != null) {
-      selectedDevice!.connect().then((value) {
-        log('连接成功');
-        selectedDevice!.discoverServices().then((services) {
-          try {
-            BluetoothCharacteristic c = services
-                .firstWhere((service) =>
-                    service.uuid.toString().toLowerCase() == serviceId)
-                .characteristics
-                .firstWhere((c) =>
-                    c.uuid.toString().toLowerCase() == characteristicsId);
-            c.write(hex.decode(_selectedCode!));
-          } on StateError catch (e) {
-            log(e.message);
-            _showErrorToast("无法送达代码到该设备");
-          } finally {
-            _updateSendingState(false);
-          }
-        }).whenComplete(() => setState(() {
-              sending = false;
-            }));
-      }).timeout(const Duration(seconds: 10), onTimeout: () {
+    if (_selectedDevice != null) {
+      _updateSendingState(true);
+      try {
+        await _selectedDevice!.connect(timeout: const Duration(seconds: 10));
+        List<BluetoothService> services =
+            await _selectedDevice!.discoverServices();
+
+        BluetoothCharacteristic c = services
+            .firstWhere((service) =>
+                service.uuid.toString().toLowerCase() == _ninebotServiceId)
+            .characteristics
+            .firstWhere((c) =>
+                c.uuid.toString().toLowerCase() == _ninebotCharacteristicsId);
+
+        c.write(hex.decode(_selectedCode!));
+      } on TimeoutException catch (e) {
+        log(e.toString());
         _showErrorToast("连接设备超时");
+      } on StateError catch (e) {
+        log(e.message);
+        _showErrorToast("无法送达代码到该设备");
+      } finally {
         _updateSendingState(false);
-      });
+      }
     } else {
       _showErrorToast("请先搜索并选择设备");
     }
@@ -192,7 +192,7 @@ class _AppMainState extends State<AppMain> {
 
   void _updateSendingState(state) {
     setState(() {
-      sending = state;
+      _isSending = state;
     });
   }
 
