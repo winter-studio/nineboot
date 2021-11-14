@@ -27,7 +27,7 @@ class _AppContentState extends State<AppContent> {
     '5AA500324357736C4C54413872': '(新代码)5AA500324357736C4C54413872'
   };
   String? _selectedCode = '5AA5007057457776656E467A39';
-  BluetoothDevice? _selectedDevice;
+  BluetoothDevice? _device;
   final _selectedDeviceId = TextEditingController();
   bool _isSending = false;
 
@@ -113,8 +113,8 @@ class _AppContentState extends State<AppContent> {
                     .then((value) {
                   if (value != null) {
                     setState(() {
-                      _selectedDevice = value;
-                      _selectedDeviceId.text = _selectedDevice!.id.id;
+                      _device = value;
+                      _selectedDeviceId.text = _device!.id.id;
                     });
                   }
                 });
@@ -151,12 +151,23 @@ class _AppContentState extends State<AppContent> {
   }
 
   Future<void> _sendData() async {
-    if (_selectedDevice != null) {
+    if (_device != null) {
       _updateSendingState(true);
+      debugPrint("1");
+      await _device!.connect(autoConnect: false).timeout(const Duration(seconds:5), onTimeout: (){
+        debugPrint("2");
+        _showErrorToast("连接设备超时");
+        _device!.disconnect();
+        return;
+      }).onError((error, stackTrace){
+        //ignore
+        log(error.toString());
+      });
+
       try {
-        await _selectedDevice!.connect(timeout: const Duration(seconds: 10));
+        debugPrint("3");
         List<BluetoothService> services =
-            await _selectedDevice!.discoverServices();
+            await _device!.discoverServices();
 
         BluetoothCharacteristic c = services
             .firstWhere((service) =>
@@ -166,13 +177,14 @@ class _AppContentState extends State<AppContent> {
                 c.uuid.toString().toLowerCase() == _ninebotCharacteristicsId);
 
         c.write(hex.decode(_selectedCode!));
-      } on TimeoutException catch (e) {
-        log(e.toString());
-        _showErrorToast("连接设备超时");
       } on StateError catch (e) {
         log(e.message);
-        _showErrorToast("无法送达代码到该设备");
+        _showErrorToast("找不到九号车的特征值");
+      } on Error catch (e) {
+        log(e.stackTrace.toString());
+        _showErrorToast("未知错误：" + e.toString());
       } finally {
+        _device!.disconnect();
         _updateSendingState(false);
       }
     } else {

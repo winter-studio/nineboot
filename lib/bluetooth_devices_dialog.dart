@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BluetoothDevicesDialog extends StatefulWidget {
   const BluetoothDevicesDialog({Key? key}) : super(key: key);
@@ -23,17 +24,26 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
   bool _isLoading = false;
   Stream<bool>? _isScanning;
   final ScrollController _scrollController = ScrollController();
+  late List<String> _myFavorites;
+  late SharedPreferences prefs;
+  static const myFavoritesKey = "myFavorites";
 
   @override
   void dispose() {
     _stopScan();
     _isScanning = null;
+    // save _myFavorites
+    prefs.setStringList(myFavoritesKey, _myFavorites);
     super.dispose();
   }
 
   @override
-  void initState() {
+  Future<void> initState() async {
     super.initState();
+    prefs = await SharedPreferences.getInstance();
+    _myFavorites = prefs.containsKey("myFavorites")
+        ? prefs.getStringList("myFavorites")!
+        : [];
     _isScanning = _flutterBlue.isScanning;
     _isScanning?.listen((event) {
       if (event != _isLoading && mounted) {
@@ -193,20 +203,29 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                scanResult.device.name.isEmpty
-                    ? '未知设备'
-                    : scanResult.device.name,
-                style: const TextStyle(color: Colors.grey),
-              ),
-              Text(scanResult.device.id.id),
-            ]),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      scanResult.device.name.isEmpty
+                          ? '未知设备'
+                          : scanResult.device.name,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    Text(scanResult.device.id.id),
+                  ]),
+            ),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 _buildSignalIcon(scanResult.rssi),
+              ],
+            ),
+            Column(
+              children: [
+                _buildFavoriteButton(scanResult.device.id.id),
               ],
             )
           ],
@@ -235,7 +254,8 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
       ));
     }
 
-    return SizedBox(
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
       width: 24,
       height: 24,
       child: Row(
@@ -244,5 +264,25 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
         children: blocks,
       ),
     );
+  }
+
+  Widget _buildFavoriteButton(String id) {
+    return Container(
+        margin: const EdgeInsets.only(left: 8),
+        child: IconButton(
+            icon: Icon(
+              Icons.star,
+              size: 26,
+              color: _myFavorites.contains(id) ? Colors.orange : Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                if (_myFavorites.contains(id)) {
+                  _myFavorites.remove(id);
+                } else {
+                  _myFavorites.add(id);
+                }
+              });
+            }));
   }
 }

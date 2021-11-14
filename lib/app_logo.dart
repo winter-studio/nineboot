@@ -15,38 +15,31 @@ class AppLogo extends StatefulWidget {
 
 class _AppLogoState extends State<AppLogo> {
   double _height = 0;
-  final StateMachineController _controller =
-      StateMachineController(StateMachine());
 
   @override
   Widget build(BuildContext context) {
-    var mediaWidth = MediaQuery.of(context).size.width;
+    var mediaWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
-    return Column(
-      children: [
-        SizedBox(
-            width: mediaWidth,
-            height: _height,
-            child: RiveAnimation.asset(assetsAnimationBike,
-                fit: BoxFit.fitWidth,
-                controllers: [_controller],
-                stateMachines: const ["press"],
-                onInit: (Artboard artboard) => {
-                      setState(() {
-                        log(artboard.width.toString());
-                        log(artboard.height.toString());
+    return SizedBox(
+        width: mediaWidth,
+        height: _height,
+        child: RiveAnimation.asset(assetsAnimationBike,
+            fit: BoxFit.fitWidth,
+            stateMachines: const ["press"],
+            onInit: (Artboard artboard) =>
+            {_onRiveInit(artboard, mediaWidth)}));
+  }
 
-                        _height = mediaWidth * artboard.height/ artboard.width;
-                      })
-                    })),
-        Container(
-          margin: const EdgeInsets.only(top: 16),
-          child: const Text(
-            'NineBoot',
-            style: TextStyle(fontSize: 50, color: Colors.black54),
-          ),
-        ),
-      ],
-    );
+  void _onRiveInit(Artboard artboard, double mediaWidth) {
+    setState(() {
+      _height = mediaWidth * artboard.height / artboard.width;
+    });
+    final controller = StateMachineController.fromArtboard(artboard, 'press');
+    artboard.addController(controller!);
+    SMIBool _pressed = controller.findInput<bool>('pressed') as SMIBool;
+    _pressed.value = true;
   }
 }
