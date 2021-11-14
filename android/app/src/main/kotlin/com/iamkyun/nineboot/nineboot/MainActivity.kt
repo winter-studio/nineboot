@@ -1,4 +1,4 @@
-package com.iamkyun.nineboot.nineboot
+package com.iamkyun.nineboot
 
 import io.flutter.embedding.android.FlutterActivity
 

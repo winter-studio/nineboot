@@ -46,7 +46,8 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.iamkyun.nineboot.nineboot"
+        applicationId "com.iamkyun.nineboot"
+        applicationName "nineboot"
         minSdkVersion 19
         targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
