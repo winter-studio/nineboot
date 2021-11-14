@@ -29,7 +29,14 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 30
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            def appName = "nineboot"
+            outputFileName = "${appName}-${defaultConfig.versionName}-${variant.buildType.name}.apk"
+        }
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -47,9 +54,8 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.iamkyun.nineboot"
-        applicationName "nineboot"
         minSdkVersion 19
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -68,14 +74,10 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
-            applicationVariants.all { variant ->
-                variant.outputs.all {
-                    outputFileName = "${applicationName}-${defaultConfig.versionName}-${variant.buildType.name}.apk"
-
-                }
-            }
         }
     }
+
+
 }
 
 flutter {
