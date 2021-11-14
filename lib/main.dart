@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'app_content.dart';
 import 'app_logo.dart';
+import 'local_storage.dart';
 
 void main() {
+  LocalStorage();
   runApp(const MyApp());
 }
 

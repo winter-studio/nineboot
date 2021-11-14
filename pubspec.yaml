@@ -25,7 +25,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/
+    - assets/animation/bike.riv
 
 flutter_icons:
   android: "launcher_icon"

@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:nineboot/local_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BluetoothDevicesDialog extends StatefulWidget {
@@ -25,25 +26,23 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
   Stream<bool>? _isScanning;
   final ScrollController _scrollController = ScrollController();
   late List<String> _myFavorites;
-  late SharedPreferences prefs;
-  static const myFavoritesKey = "myFavorites";
+
+  _BluetoothListState() {
+    _myFavorites = LocalStorage().getMyFavorites();
+  }
 
   @override
   void dispose() {
     _stopScan();
     _isScanning = null;
     // save _myFavorites
-    prefs.setStringList(myFavoritesKey, _myFavorites);
+    LocalStorage().setMyFavorites(_myFavorites);
     super.dispose();
   }
 
   @override
-  Future<void> initState() async {
+  void initState() {
     super.initState();
-    prefs = await SharedPreferences.getInstance();
-    _myFavorites = prefs.containsKey("myFavorites")
-        ? prefs.getStringList("myFavorites")!
-        : [];
     _isScanning = _flutterBlue.isScanning;
     _isScanning?.listen((event) {
       if (event != _isLoading && mounted) {
@@ -218,7 +217,6 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
                   ]),
             ),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 _buildSignalIcon(scanResult.rssi),
               ],
