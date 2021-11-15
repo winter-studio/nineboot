@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nineboot/toast_message.dart';
 import 'package:rive/rive.dart';
 
 const assetsImagePath = "assets/images/logo.png";
@@ -28,7 +27,6 @@ class _AppLogoState extends State<AppLogo> {
     return LayoutBuilder(builder: (_, BoxConstraints constraints) {
       if (constraints.maxWidth != 0) {
         var mediaWidth = MediaQuery.of(context).size.width;
-        ToastMessage.info("mediaWidth:$mediaWidth");
         return Container(
           color: Colors.black12,
           width: mediaWidth,
@@ -54,8 +52,6 @@ class _AppLogoState extends State<AppLogo> {
 
   void _onRiveInit(Artboard artboard, double mediaWidth) {
     double height = mediaWidth * artboard.height / artboard.width;
-    ToastMessage.info(
-        "_onRiveInit:$height,$mediaWidth,${artboard.height},${artboard.width}");
     setState(() {
       _height = height;
     });
