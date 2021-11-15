@@ -5,7 +5,7 @@ import 'package:convert/convert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:nineboot/toast_message.dart';
 
 import 'bluetooth_devices_dialog.dart';
 
@@ -154,20 +154,21 @@ class _AppContentState extends State<AppContent> {
     if (_device != null) {
       _updateSendingState(true);
       debugPrint("1");
-      await _device!.connect(autoConnect: false).timeout(const Duration(seconds:5), onTimeout: (){
+      await _device!
+          .connect(autoConnect: false)
+          .timeout(const Duration(seconds: 5), onTimeout: () {
         debugPrint("2");
-        _showErrorToast("连接设备超时");
+        ToastMessage.error("连接设备超时");
         _device!.disconnect();
         return;
-      }).onError((error, stackTrace){
+      }).onError((error, stackTrace) {
         //ignore
         log(error.toString());
       });
 
       try {
         debugPrint("3");
-        List<BluetoothService> services =
-            await _device!.discoverServices();
+        List<BluetoothService> services = await _device!.discoverServices();
 
         BluetoothCharacteristic c = services
             .firstWhere((service) =>
@@ -179,16 +180,16 @@ class _AppContentState extends State<AppContent> {
         c.write(hex.decode(_selectedCode!));
       } on StateError catch (e) {
         log(e.message);
-        _showErrorToast("找不到九号车的特征值");
+        ToastMessage.error("找不到九号车的特征值");
       } on Error catch (e) {
         log(e.stackTrace.toString());
-        _showErrorToast("未知错误：" + e.toString());
+        ToastMessage.error("未知错误：" + e.toString());
       } finally {
         _device!.disconnect();
         _updateSendingState(false);
       }
     } else {
-      _showErrorToast("请先搜索并选择设备");
+      ToastMessage.error("请先搜索并选择设备");
     }
   }
 
@@ -196,17 +197,6 @@ class _AppContentState extends State<AppContent> {
     setState(() {
       _isSending = state;
     });
-  }
-
-  void _showErrorToast(msg) {
-    Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 18.0);
   }
 
   List<Widget> _buildFields() {

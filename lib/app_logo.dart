@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:nineboot/toast_message.dart';
 import 'package:rive/rive.dart';
 
 const assetsImagePath = "assets/images/logo.png";
@@ -14,28 +13,51 @@ class AppLogo extends StatefulWidget {
 }
 
 class _AppLogoState extends State<AppLogo> {
-  double _height = 0;
+  late double _height;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _height = 200;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    var mediaWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-
-    return SizedBox(
-        width: mediaWidth,
-        height: _height,
-        child: RiveAnimation.asset(assetsAnimationBike,
-            fit: BoxFit.fitWidth,
-            stateMachines: const ["press"],
-            onInit: (Artboard artboard) =>
-            {_onRiveInit(artboard, mediaWidth)}));
+    return LayoutBuilder(builder: (_, BoxConstraints constraints) {
+      if (constraints.maxWidth != 0) {
+        var mediaWidth = MediaQuery.of(context).size.width;
+        ToastMessage.info("mediaWidth:$mediaWidth");
+        return Container(
+          color: Colors.black12,
+          width: mediaWidth,
+          height: _height,
+          alignment: Alignment.center,
+          child: RiveAnimation.asset(assetsAnimationBike,
+              fit: BoxFit.fitWidth,
+              placeHolder: const SizedBox(
+                height: 5,
+                width: 100,
+                child: LinearProgressIndicator(
+                  backgroundColor: Colors.blueGrey,
+                  color: Colors.blue,
+                ),
+              ),
+              onInit: (Artboard artboard) =>
+                  {_onRiveInit(artboard, mediaWidth)}),
+        );
+      }
+      return Container();
+    });
   }
 
   void _onRiveInit(Artboard artboard, double mediaWidth) {
+    double height = mediaWidth * artboard.height / artboard.width;
+    ToastMessage.info(
+        "_onRiveInit:$height,$mediaWidth,${artboard.height},${artboard.width}");
     setState(() {
-      _height = mediaWidth * artboard.height / artboard.width;
+      _height = height;
     });
     final controller = StateMachineController.fromArtboard(artboard, 'press');
     artboard.addController(controller!);

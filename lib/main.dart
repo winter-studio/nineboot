@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       home: SafeArea(
           child: Scaffold(
         body: Column(
-          children: const [AppLogo(), AppContent()],
+          children: [AppLogo(), AppContent()],
         ),
       )),
     );

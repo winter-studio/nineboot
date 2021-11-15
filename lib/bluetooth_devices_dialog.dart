@@ -6,9 +6,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nineboot/local_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nineboot/toast_message.dart';
 
 class BluetoothDevicesDialog extends StatefulWidget {
   const BluetoothDevicesDialog({Key? key}) : super(key: key);
@@ -121,14 +120,7 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
           ),
           onPressed: () {
             if (_selectedDevice == null) {
-              Fluttertoast.showToast(
-                  msg: "请选择设备",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.red,
-                  textColor: Colors.white,
-                  fontSize: 18.0);
+              ToastMessage.error("请选择设备");
             } else {
               Navigator.pop(context, _selectedDevice?.device);
             }
