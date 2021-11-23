@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalStorage {
   late SharedPreferences _prefs;
   static const myFavoritesKey = "MyFavorites";
+  static const autoConnect = "autoConnect";
   static final LocalStorage _instance = LocalStorage._internal();
 
   factory LocalStorage() {
@@ -23,5 +24,13 @@ class LocalStorage {
 
   void setMyFavorites(List<String> data) {
     _prefs.setStringList(myFavoritesKey, data);
+  }
+
+  String? getAutoConnect() {
+    return _prefs.getString(autoConnect);
+  }
+
+  void setAutoConnect(String data) {
+    _prefs.setString(autoConnect, data);
   }
 }
