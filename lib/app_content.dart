@@ -8,6 +8,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:nineboot/toast_message.dart';
 
 import 'bluetooth_devices_dialog.dart';
+import 'local_storage.dart';
 
 class AppContent extends StatefulWidget {
   const AppContent({Key? key}) : super(key: key);
@@ -30,6 +31,8 @@ class _AppContentState extends State<AppContent> {
   BluetoothDevice? _device;
   final _selectedDeviceId = TextEditingController();
   bool _isSending = false;
+  final FlutterBlue _flutterBlue = FlutterBlue.instance;
+  final String? _autoConnect = LocalStorage().getAutoConnect();
 
   @override
   Widget build(BuildContext context) {
@@ -151,45 +154,62 @@ class _AppContentState extends State<AppContent> {
   }
 
   Future<void> _sendData() async {
-    if (_device != null) {
-      _updateSendingState(true);
-      debugPrint("1");
-      await _device!
-          .connect(autoConnect: false)
-          .timeout(const Duration(seconds: 5), onTimeout: () {
-        debugPrint("2");
-        ToastMessage.error("连接设备超时");
-        _device!.disconnect();
-        return;
-      }).onError((error, stackTrace) {
-        //ignore
-        log(error.toString());
-      });
-
-      try {
-        debugPrint("3");
-        List<BluetoothService> services = await _device!.discoverServices();
-
-        BluetoothCharacteristic c = services
-            .firstWhere((service) =>
-                service.uuid.toString().toLowerCase() == _ninebotServiceId)
-            .characteristics
-            .firstWhere((c) =>
-                c.uuid.toString().toLowerCase() == _ninebotCharacteristicsId);
-
-        c.write(hex.decode(_selectedCode!));
-      } on StateError catch (e) {
-        log(e.message);
-        ToastMessage.error("找不到九号车的特征值");
-      } on Error catch (e) {
-        log(e.stackTrace.toString());
-        ToastMessage.error("未知错误：" + e.toString());
-      } finally {
-        _device!.disconnect();
-        _updateSendingState(false);
-      }
-    } else {
+    if (_device == null && _autoConnect == null) {
       ToastMessage.error("请先搜索并选择设备");
+    }
+
+    _updateSendingState(true);
+
+    if (_device == null) {
+      var timer =
+          Timer(const Duration(seconds: 10), () => {_flutterBlue.stopScan()});
+
+      // search device by guid
+      _flutterBlue.startScan(withDevices: [Guid(_autoConnect!)]);
+
+      _flutterBlue.scanResults.listen((results) {
+        setState(() {
+          _device = results.toList()[0].device;
+        });
+        _flutterBlue.stopScan();
+      }, onDone: () => {timer.cancel()});
+
+      if (_device == null) {
+        ToastMessage.error("搜寻不到设备");
+      }
+    }
+
+    await _device!
+        .connect(autoConnect: false)
+        .timeout(const Duration(seconds: 5), onTimeout: () {
+      ToastMessage.error("连接设备超时");
+      _device!.disconnect();
+      return;
+    }).onError((error, stackTrace) {
+      //ignore
+      log(error.toString());
+    });
+
+    try {
+      List<BluetoothService> services = await _device!.discoverServices();
+
+      BluetoothCharacteristic c = services
+          .firstWhere((service) =>
+              service.uuid.toString().toLowerCase() == _ninebotServiceId)
+          .characteristics
+          .firstWhere((c) =>
+              c.uuid.toString().toLowerCase() == _ninebotCharacteristicsId);
+
+      c.write(hex.decode(_selectedCode!));
+    } on StateError catch (e) {
+      log(e.message);
+      ToastMessage.error("找不到九号车的特征值");
+    } on Error catch (e) {
+      log(e.stackTrace.toString());
+      ToastMessage.error("未知错误：" + e.toString());
+    } finally {
+      _device!.disconnect();
+      _updateSendingState(false);
     }
   }
 
