@@ -146,7 +146,7 @@ class _AppContentState extends State<AppContent> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Text(
-                      S.of(context).boot,
+                      S.of(context).send,
                       style:
                           const TextStyle(color: Colors.white, fontSize: 46.0),
                     ),

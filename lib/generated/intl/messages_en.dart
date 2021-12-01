@@ -22,7 +22,6 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-        "boot": MessageLookupByLibrary.simpleMessage("BOOT"),
         "cancel": MessageLookupByLibrary.simpleMessage("cancel"),
         "characteristicNotFound": MessageLookupByLibrary.simpleMessage(
             "could not find the characteristic of ninebot"),
@@ -41,6 +40,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("please select your device."),
         "selectedDevice":
             MessageLookupByLibrary.simpleMessage("Selected Device"),
+        "send": MessageLookupByLibrary.simpleMessage("SEND"),
         "stopScan": MessageLookupByLibrary.simpleMessage("Stop Scan"),
         "unknownDevice": MessageLookupByLibrary.simpleMessage("Unknown"),
         "unknownError": MessageLookupByLibrary.simpleMessage("Unknown Error")

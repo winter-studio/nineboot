@@ -22,7 +22,6 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-        "boot": MessageLookupByLibrary.simpleMessage("发 送"),
         "cancel": MessageLookupByLibrary.simpleMessage("取消"),
         "characteristicNotFound":
             MessageLookupByLibrary.simpleMessage("找不到九号车的特征值"),
@@ -37,6 +36,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "searchDeviceTip": MessageLookupByLibrary.simpleMessage("请先搜索并选择设备"),
         "selectDeviceTip": MessageLookupByLibrary.simpleMessage("请选择设备"),
         "selectedDevice": MessageLookupByLibrary.simpleMessage("选择蓝牙设备"),
+        "send": MessageLookupByLibrary.simpleMessage("发 送"),
         "stopScan": MessageLookupByLibrary.simpleMessage("停止扫描"),
         "unknownDevice": MessageLookupByLibrary.simpleMessage("未知设备"),
         "unknownError": MessageLookupByLibrary.simpleMessage("未知错误")

@@ -190,11 +190,11 @@ class S {
     );
   }
 
-  /// `BOOT`
-  String get boot {
+  /// `SEND`
+  String get send {
     return Intl.message(
-      'BOOT',
-      name: 'boot',
+      'SEND',
+      name: 'send',
       desc: '',
       args: [],
     );

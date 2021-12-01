@@ -13,6 +13,6 @@
   "confirm": "confirm",
   "stopScan": "Stop Scan",
   "scanAgain": "Scan Again",
-  "boot": "BOOT",
+  "send": "SEND",
   "deviceNotFound": "device not found, ensure your device is nearby"
 }

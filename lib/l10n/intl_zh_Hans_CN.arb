@@ -13,6 +13,6 @@
   "confirm": "确定",
   "stopScan": "停止扫描",
   "scanAgain": "重新扫描",
-  "boot": "发 送",
+  "send": "发 送",
   "deviceNotFound": "搜寻不到设备，请确定设备在您的周围"
 }
