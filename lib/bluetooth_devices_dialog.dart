@@ -9,6 +9,8 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:nineboot/local_storage.dart';
 import 'package:nineboot/toast_message.dart';
 
+import 'generated/l10n.dart';
+
 class BluetoothDevicesDialog extends StatefulWidget {
   const BluetoothDevicesDialog({Key? key}) : super(key: key);
 
@@ -69,7 +71,7 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('蓝牙列表'),
+      title: Text(S.of(context).deviceList),
       titleTextStyle: const TextStyle(color: Colors.blue, fontSize: 18),
       contentPadding: const EdgeInsets.only(left: 20, right: 20, top: 10),
       buttonPadding: EdgeInsets.zero,
@@ -78,9 +80,9 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
       actionsAlignment: MainAxisAlignment.spaceEvenly,
       actions: [
         TextButton(
-          child: const Text(
-            '取消',
-            style: TextStyle(fontSize: 18, color: Colors.red),
+          child: Text(
+            S.of(context).cancel,
+            style: const TextStyle(fontSize: 18, color: Colors.red),
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -91,13 +93,13 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
               ? SizedBox(
                   width: 120,
                   child: Column(
-                    children: const [
+                    children: [
                       Text(
-                        '停止扫描',
-                        style:
-                            TextStyle(fontSize: 18, color: Colors.deepOrange),
+                        S.of(context).stopScan,
+                        style: const TextStyle(
+                            fontSize: 18, color: Colors.deepOrange),
                       ),
-                      SizedBox(
+                      const SizedBox(
                           width: 70,
                           height: 3,
                           child: LinearProgressIndicator(
@@ -106,9 +108,9 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
                     ],
                   ),
                 )
-              : const Text(
-                  '重新扫描',
-                  style: TextStyle(fontSize: 18, color: Colors.green),
+              : Text(
+                  S.of(context).scanAgain,
+                  style: const TextStyle(fontSize: 18, color: Colors.green),
                 ),
           onPressed: () {
             if (_isLoading) {
@@ -119,13 +121,13 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
           },
         ),
         TextButton(
-          child: const Text(
-            '确定',
-            style: TextStyle(fontSize: 18),
+          child: Text(
+            S.of(context).confirm,
+            style: const TextStyle(fontSize: 18),
           ),
           onPressed: () {
             if (_selectedDevice == null) {
-              ToastMessage.error("请选择设备");
+              ToastMessage.error(S.of(context).selectDeviceTip);
             } else {
               Navigator.pop(context, _selectedDevice?.device);
             }
@@ -206,7 +208,7 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
                   children: [
                     Text(
                       scanResult.device.name.isEmpty
-                          ? '未知设备'
+                          ? S.of(context).unknownDevice
                           : scanResult.device.name,
                       style: const TextStyle(color: Colors.grey),
                     ),

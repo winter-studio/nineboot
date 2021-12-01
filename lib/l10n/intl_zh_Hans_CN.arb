@@ -1,0 +1,18 @@
+{
+  "code": "代码",
+  "selectedDevice": "选择蓝牙设备",
+  "searchDevice": "搜索设备",
+  "searchDeviceTip": "请先搜索并选择设备",
+  "connectTimeout": "连接设备超时",
+  "characteristicNotFound": "找不到九号车的特征值",
+  "unknownError": "未知错误",
+  "unknownDevice": "未知设备",
+  "deviceList": "蓝牙列表",
+  "selectDeviceTip": "请选择设备",
+  "cancel": "取消",
+  "confirm": "确定",
+  "stopScan": "停止扫描",
+  "scanAgain": "重新扫描",
+  "boot": "发 送",
+  "deviceNotFound": "搜寻不到设备，请确定设备在您的周围"
+}

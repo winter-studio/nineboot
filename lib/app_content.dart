@@ -8,6 +8,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:nineboot/toast_message.dart';
 
 import 'bluetooth_devices_dialog.dart';
+import 'generated/l10n.dart';
 import 'local_storage.dart';
 
 class AppContent extends StatefulWidget {
@@ -51,7 +52,7 @@ class _AppContentState extends State<AppContent> {
       Expanded(
           child: InputDecorator(
         decoration: InputDecoration(
-            labelText: '代码',
+            labelText: S.of(context).code,
             labelStyle: const TextStyle(color: Colors.blue, fontSize: 16.0),
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
@@ -84,7 +85,7 @@ class _AppContentState extends State<AppContent> {
         enabled: false,
         controller: _selectedDeviceId,
         decoration: InputDecoration(
-            labelText: '选择蓝牙设备',
+            labelText: S.of(context).selectedDevice,
             labelStyle: const TextStyle(color: Colors.blue, fontSize: 16.0),
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
@@ -100,12 +101,12 @@ class _AppContentState extends State<AppContent> {
               padding: const EdgeInsets.all(6),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
+                children: <Widget>[
                   Text(
-                    "搜索设备",
-                    style: TextStyle(color: Colors.white, fontSize: 16.0),
+                    S.of(context).searchDevice,
+                    style: const TextStyle(color: Colors.white, fontSize: 16.0),
                   ),
-                  Icon(Icons.search),
+                  const Icon(Icons.search),
                 ],
               ),
               onPressed: () async {
@@ -143,10 +144,11 @@ class _AppContentState extends State<AppContent> {
                 shape: const CircleBorder(),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: const <Widget>[
+                  children: <Widget>[
                     Text(
-                      "发 送",
-                      style: TextStyle(color: Colors.white, fontSize: 46.0),
+                      S.of(context).boot,
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 46.0),
                     ),
                   ],
                 ),
@@ -155,7 +157,7 @@ class _AppContentState extends State<AppContent> {
 
   Future<void> _sendData() async {
     if (_device == null && _autoConnect == null) {
-      ToastMessage.error("请先搜索并选择设备");
+      ToastMessage.error(S.of(context).searchDeviceTip);
     }
 
     _updateSendingState(true);
@@ -175,14 +177,14 @@ class _AppContentState extends State<AppContent> {
       }, onDone: () => {timer.cancel()});
 
       if (_device == null) {
-        ToastMessage.error("搜寻不到设备");
+        ToastMessage.error(S.of(context).deviceNotFound);
       }
     }
 
     await _device!
         .connect(autoConnect: false)
         .timeout(const Duration(seconds: 5), onTimeout: () {
-      ToastMessage.error("连接设备超时");
+      ToastMessage.error(S.of(context).connectTimeout);
       _device!.disconnect();
       return;
     }).onError((error, stackTrace) {
@@ -203,10 +205,10 @@ class _AppContentState extends State<AppContent> {
       c.write(hex.decode(_selectedCode!));
     } on StateError catch (e) {
       log(e.message);
-      ToastMessage.error("找不到九号车的特征值");
+      ToastMessage.error(S.of(context).characteristicNotFound);
     } on Error catch (e) {
       log(e.stackTrace.toString());
-      ToastMessage.error("未知错误：" + e.toString());
+      ToastMessage.error(S.of(context).unknownError + " : " + e.toString());
     } finally {
       _device!.disconnect();
       _updateSendingState(false);

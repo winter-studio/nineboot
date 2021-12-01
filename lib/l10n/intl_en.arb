@@ -1,0 +1,18 @@
+{
+  "code": "Code",
+  "selectedDevice": "Selected Device",
+  "searchDevice": "search",
+  "searchDeviceTip": "please search and select your device.",
+  "connectTimeout": "connect device timeout",
+  "characteristicNotFound": "could not find the characteristic of ninebot",
+  "unknownError": "Unknown Error",
+  "unknownDevice": "Unknown",
+  "deviceList": "Devices",
+  "selectDeviceTip": "please select your device.",
+  "cancel": "cancel",
+  "confirm": "confirm",
+  "stopScan": "Stop Scan",
+  "scanAgain": "Scan Again",
+  "boot": "BOOT",
+  "deviceNotFound": "device not found, ensure your device is nearby"
+}
