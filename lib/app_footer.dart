@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'generated/l10n.dart';
 
@@ -11,11 +10,13 @@ class AppFooter extends StatefulWidget {
 }
 
 class _AppFooterState extends State<AppFooter> {
-  Locale locale = Locale(Intl.getCurrentLocale());
+  // Locale locale = Locale(Intl.getCurrentLocale());
+  late Locale locale;
   List<Locale> locales = S.delegate.supportedLocales;
 
   @override
   Widget build(BuildContext context) {
+    locale = Localizations.localeOf(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
