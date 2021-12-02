@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'generated/l10n.dart';
 
@@ -10,7 +11,7 @@ class AppFooter extends StatefulWidget {
 }
 
 class _AppFooterState extends State<AppFooter> {
-  String locale = 'en';
+  Locale locale = Locale(Intl.getCurrentLocale());
   List<Locale> locales = S.delegate.supportedLocales;
 
   @override
@@ -27,17 +28,19 @@ class _AppFooterState extends State<AppFooter> {
           ),
         ),
         DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
+            child: DropdownButton<Locale>(
           value: locale,
-          onChanged: (String? newValue) {
-            S.load(Locale.fromSubtags(languageCode: newValue!));
-            setState(() {
-              locale = newValue;
-            });
+          onChanged: (Locale? newValue) {
+            if (newValue != null) {
+              S.load(newValue);
+              setState(() {
+                locale = newValue;
+              });
+            }
           },
-          items: locales.map<DropdownMenuItem<String>>((Locale value) {
-            return DropdownMenuItem<String>(
-              value: value.languageCode,
+          items: locales.map<DropdownMenuItem<Locale>>((Locale value) {
+            return DropdownMenuItem<Locale>(
+              value: value,
               child: Text(value.languageCode),
             );
           }).toList(),
