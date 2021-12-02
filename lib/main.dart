@@ -33,7 +33,13 @@ class MyApp extends StatelessWidget {
       home: SafeArea(
           child: Scaffold(
         body: Column(
-          children: const [AppLogo(), AppContent(), AppFooter()],
+          children: [
+            const AppLogo(),
+            const Expanded(child: AppContent()),
+            Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: const AppFooter())
+          ],
         ),
       )),
     );

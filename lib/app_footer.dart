@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:nineboot/generated/l10n.dart';
+
+import 'generated/l10n.dart';
 
 class AppFooter extends StatefulWidget {
   const AppFooter({Key? key}) : super(key: key);
@@ -10,32 +10,39 @@ class AppFooter extends StatefulWidget {
 }
 
 class _AppFooterState extends State<AppFooter> {
-  String locale = Intl.systemLocale;
+  String locale = 'en';
+  List<Locale> locales = S.delegate.supportedLocales;
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: locale,
-      icon: const Icon(Icons.arrow_downward),
-      iconSize: 24,
-      elevation: 16,
-      style: const TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),
-      onChanged: (String? newValue) {
-        setState(() {
-          locale = newValue!;
-        });
-      },
-      items: S.delegate.supportedLocales
-          .map<DropdownMenuItem<String>>((Locale locale) {
-        return DropdownMenuItem<String>(
-          value: locale.languageCode,
-          child: Text(locale.languageCode),
-        );
-      }).toList(),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(right: 12),
+          child: const Icon(
+            Icons.translate,
+            size: 24,
+          ),
+        ),
+        DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+          value: locale,
+          onChanged: (String? newValue) {
+            S.load(Locale.fromSubtags(languageCode: newValue!));
+            setState(() {
+              locale = newValue;
+            });
+          },
+          items: locales.map<DropdownMenuItem<String>>((Locale value) {
+            return DropdownMenuItem<String>(
+              value: value.languageCode,
+              child: Text(value.languageCode),
+            );
+          }).toList(),
+        )),
+      ],
     );
   }
 }
