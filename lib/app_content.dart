@@ -30,10 +30,10 @@ class _AppContentState extends State<AppContent> {
   };
   String? _selectedCode = '5AA5007057457776656E467A39';
   BluetoothDevice? _device;
-  final _selectedDeviceId = TextEditingController();
+  final _selectedDeviceId =
+      TextEditingController(text: LocalStorage().getAutoConnect());
   bool _isSending = false;
   final FlutterBlue _flutterBlue = FlutterBlue.instance;
-  final String? _autoConnect = LocalStorage().getAutoConnect();
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +156,8 @@ class _AppContentState extends State<AppContent> {
   }
 
   Future<void> _sendData() async {
-    if (_device == null && _autoConnect == null) {
+    if (_device == null &&
+        _selectedDeviceId.text == TextEditingValue.empty.text) {
       ToastMessage.error(S.of(context).searchDeviceTip);
     }
 
@@ -167,7 +168,7 @@ class _AppContentState extends State<AppContent> {
           Timer(const Duration(seconds: 10), () => {_flutterBlue.stopScan()});
 
       // search device by guid
-      _flutterBlue.startScan(withDevices: [Guid(_autoConnect!)]);
+      _flutterBlue.startScan(withDevices: [Guid(_selectedDeviceId.text)]);
 
       _flutterBlue.scanResults.listen((results) {
         setState(() {

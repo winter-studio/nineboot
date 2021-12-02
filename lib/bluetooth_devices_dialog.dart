@@ -26,11 +26,9 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
   bool _isLoading = false;
   Stream<bool>? _isScanning;
   final ScrollController _scrollController = ScrollController();
-  late List<String> _myFavorites;
   String? _autoConnect;
 
   _BluetoothListState() {
-    _myFavorites = LocalStorage().getMyFavorites();
     _autoConnect = LocalStorage().getAutoConnect();
   }
 
@@ -38,8 +36,6 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
   void dispose() {
     _stopScan();
     _isScanning = null;
-    // save _myFavorites
-    LocalStorage().setMyFavorites(_myFavorites);
     if (_autoConnect != null) {
       LocalStorage().setAutoConnect(_autoConnect!);
     }
@@ -222,11 +218,6 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
             ),
             Column(
               children: [
-                _buildFavoriteButton(scanResult.device.id.id),
-              ],
-            ),
-            Column(
-              children: [
                 _buildAutoConnectButton(scanResult.device.id.id),
               ],
             )
@@ -266,26 +257,6 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
         children: blocks,
       ),
     );
-  }
-
-  Widget _buildFavoriteButton(String id) {
-    return Container(
-        margin: const EdgeInsets.only(left: 8),
-        child: IconButton(
-            icon: Icon(
-              Icons.star,
-              size: 26,
-              color: _myFavorites.contains(id) ? Colors.orange : Colors.grey,
-            ),
-            onPressed: () {
-              setState(() {
-                if (_myFavorites.contains(id)) {
-                  _myFavorites.remove(id);
-                } else {
-                  _myFavorites.add(id);
-                }
-              });
-            }));
   }
 
   Widget _buildAutoConnectButton(String id) {
