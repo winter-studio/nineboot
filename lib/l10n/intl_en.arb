@@ -14,5 +14,6 @@
   "stopScan": "Stop Scan",
   "scanAgain": "Scan Again",
   "send": "SEND",
-  "deviceNotFound": "device not found, ensure your device is nearby"
+  "deviceNotFound": "device not found, ensure your device is nearby",
+  "tryToSearch": "trying to search and connect your device"
 }

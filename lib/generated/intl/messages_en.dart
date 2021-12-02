@@ -42,6 +42,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Selected Device"),
         "send": MessageLookupByLibrary.simpleMessage("SEND"),
         "stopScan": MessageLookupByLibrary.simpleMessage("Stop Scan"),
+        "tryToSearch": MessageLookupByLibrary.simpleMessage(
+            "trying to search and connect your device"),
         "unknownDevice": MessageLookupByLibrary.simpleMessage("Unknown"),
         "unknownError": MessageLookupByLibrary.simpleMessage("Unknown Error")
       };

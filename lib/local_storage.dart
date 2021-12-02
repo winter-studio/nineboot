@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
-  late SharedPreferences _prefs;
+  SharedPreferences? _prefs;
   static const autoConnect = "autoConnect";
   static final LocalStorage _instance = LocalStorage._internal();
 
@@ -16,10 +16,10 @@ class LocalStorage {
   }
 
   String? getAutoConnect() {
-    return _prefs.getString(autoConnect);
+    return _prefs?.getString(autoConnect);
   }
 
   void setAutoConnect(String data) {
-    _prefs.setString(autoConnect, data);
+    _prefs?.setString(autoConnect, data);
   }
 }

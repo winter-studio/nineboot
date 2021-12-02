@@ -164,21 +164,27 @@ class _AppContentState extends State<AppContent> {
     _updateSendingState(true);
 
     if (_device == null) {
-      var timer =
-          Timer(const Duration(seconds: 10), () => {_flutterBlue.stopScan()});
+      ToastMessage.info(S.of(context).tryToSearch);
+
+      _flutterBlue.scanResults.listen((List<ScanResult> results) {
+        if (results.toList().isNotEmpty) {
+          _flutterBlue.stopScan();
+          setState(() {
+            _device = results.toList()[0].device;
+          });
+        }
+      });
 
       // search device by guid
-      _flutterBlue.startScan(withDevices: [Guid(_selectedDeviceId.text)]);
-
-      _flutterBlue.scanResults.listen((results) {
-        setState(() {
-          _device = results.toList()[0].device;
-        });
-        _flutterBlue.stopScan();
-      }, onDone: () => {timer.cancel()});
+      await _flutterBlue.startScan(
+          withDevices: [Guid.fromMac(_selectedDeviceId.text)],
+          timeout: const Duration(seconds: 10));
 
       if (_device == null) {
+        _updateSendingState(false);
         ToastMessage.error(S.of(context).deviceNotFound);
+        _flutterBlue.stopScan();
+        return;
       }
     }
 

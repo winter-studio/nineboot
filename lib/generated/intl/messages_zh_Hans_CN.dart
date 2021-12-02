@@ -38,6 +38,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "selectedDevice": MessageLookupByLibrary.simpleMessage("选择蓝牙设备"),
         "send": MessageLookupByLibrary.simpleMessage("发 送"),
         "stopScan": MessageLookupByLibrary.simpleMessage("停止扫描"),
+        "tryToSearch": MessageLookupByLibrary.simpleMessage("尝试搜寻并连接您的设备"),
         "unknownDevice": MessageLookupByLibrary.simpleMessage("未知设备"),
         "unknownError": MessageLookupByLibrary.simpleMessage("未知错误")
       };

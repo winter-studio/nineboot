@@ -209,6 +209,16 @@ class S {
       args: [],
     );
   }
+
+  /// `trying to search and connect your device`
+  String get tryToSearch {
+    return Intl.message(
+      'trying to search and connect your device',
+      name: 'tryToSearch',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

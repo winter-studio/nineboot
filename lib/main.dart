@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'app_content.dart';
+import 'app_footer.dart';
 import 'app_logo.dart';
 import 'generated/l10n.dart';
 import 'local_storage.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
       home: SafeArea(
           child: Scaffold(
         body: Column(
-          children: const [AppLogo(), AppContent()],
+          children: const [AppLogo(), AppContent(), AppFooter()],
         ),
       )),
     );

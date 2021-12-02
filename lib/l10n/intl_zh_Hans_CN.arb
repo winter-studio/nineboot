@@ -14,5 +14,6 @@
   "stopScan": "停止扫描",
   "scanAgain": "重新扫描",
   "send": "发 送",
-  "deviceNotFound": "搜寻不到设备，请确定设备在您的周围"
+  "deviceNotFound": "搜寻不到设备，请确定设备在您的周围",
+  "tryToSearch": "尝试搜寻并连接您的设备"
 }
