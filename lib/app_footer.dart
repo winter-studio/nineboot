@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'generated/l10n.dart';
 
@@ -16,17 +17,12 @@ class _AppFooterState extends State<AppFooter> {
   final Map _languages = {'en': 'English', 'zh_CN': '简体中文'};
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    Locale currentLocal = Localizations.localeOf(context);
-    String tmpLocale = currentLocal.languageCode;
-    if (currentLocal.countryCode != null) {
-      tmpLocale += ('_' + currentLocal.countryCode.toString());
-      setState(() {
-        log('init locale : ' + tmpLocale);
-        _locale = tmpLocale;
-      });
-    }
+  void initState() {
+    super.initState();
+    setState(() {
+      log('init locale : ' + Intl.getCurrentLocale());
+      _locale = Intl.getCurrentLocale();
+    });
   }
 
   @override
@@ -49,13 +45,15 @@ class _AppFooterState extends State<AppFooter> {
             var codes = newValue!.split('_');
             Locale newLocale;
             if (codes.length == 1) {
-              newLocale = Locale(codes[0]);
+              newLocale = Locale.fromSubtags(languageCode: codes[0]);
             } else {
-              newLocale = Locale(codes[0], codes[1]);
+              newLocale = Locale.fromSubtags(
+                  languageCode: codes[0], countryCode: codes[1]);
             }
             setState(() {
-              S.load(newLocale);
               _locale = newValue;
+              S.load(newLocale);
+              log('change to ' + newValue);
             });
           },
           items: _languages.entries
