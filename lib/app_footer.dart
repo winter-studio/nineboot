@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'generated/l10n.dart';
@@ -10,13 +12,24 @@ class AppFooter extends StatefulWidget {
 }
 
 class _AppFooterState extends State<AppFooter> {
-  // Locale locale = Locale(Intl.getCurrentLocale());
-  late Locale locale;
-  List<Locale> locales = S.delegate.supportedLocales;
+  late String _locale;
+  final Map _languages = {'en': 'English', 'zh_CN': '简体中文'};
+
+  @override
+  void initState() {
+    super.initState();
+    Locale currentLocal = Localizations.localeOf(context);
+    String tmpLocale = currentLocal.languageCode;
+    if (currentLocal.countryCode != null) {
+      tmpLocale += ('_' + currentLocal.countryCode.toString());
+      setState(() {
+        _locale = tmpLocale;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    locale = Localizations.localeOf(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -29,22 +42,27 @@ class _AppFooterState extends State<AppFooter> {
           ),
         ),
         DropdownButtonHideUnderline(
-            child: DropdownButton<Locale>(
-          value: locale,
-          onChanged: (Locale? newValue) {
-            if (newValue != null) {
-              S.load(newValue);
-              setState(() {
-                locale = newValue;
-              });
+            child: DropdownButton<String>(
+          value: _locale,
+          onChanged: (newValue) {
+            log('selected : ' + newValue!);
+            var codes = newValue.split('_');
+            Locale newLocale;
+            if (codes.length == 1) {
+              newLocale = Locale(codes[0]);
+            } else {
+              newLocale = Locale(codes[0], codes[1]);
             }
+            S.load(newLocale);
+            setState(() {
+              _locale = newValue;
+            });
+            log(_locale);
           },
-          items: locales.map<DropdownMenuItem<Locale>>((Locale value) {
-            return DropdownMenuItem<Locale>(
-              value: value,
-              child: Text(value.languageCode),
-            );
-          }).toList(),
+          items: _languages.entries
+              .map((e) =>
+                  DropdownMenuItem<String>(value: e.key, child: Text(e.value)))
+              .toList(),
         )),
       ],
     );

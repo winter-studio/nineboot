@@ -28,7 +28,7 @@ class _AppContentState extends State<AppContent> {
     '5AA5007057457776656E467A39': '(old)5AA5007057457776656E467A39',
     '5AA500324357736C4C54413872': '(new)5AA500324357736C4C54413872'
   };
-  String? _selectedCode = '5AA5007057457776656E467A39';
+  String _selectedCode = '5AA5007057457776656E467A39';
   BluetoothDevice? _device;
   final _selectedDeviceId =
       TextEditingController(text: LocalStorage().getAutoConnect());
@@ -63,7 +63,7 @@ class _AppContentState extends State<AppContent> {
             style: const TextStyle(color: Colors.black54, fontSize: 16.0),
             onChanged: (value) => {
               setState(() {
-                _selectedCode = value;
+                _selectedCode = value!;
               })
             },
             items: _codes.entries.map((e) {
@@ -209,7 +209,7 @@ class _AppContentState extends State<AppContent> {
           .firstWhere((c) =>
               c.uuid.toString().toLowerCase() == _ninebotCharacteristicsId);
 
-      c.write(hex.decode(_selectedCode!));
+      c.write(hex.decode(_selectedCode));
     } on StateError catch (e) {
       log(e.message);
       ToastMessage.error(S.of(context).characteristicNotFound);
