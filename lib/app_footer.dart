@@ -16,13 +16,14 @@ class _AppFooterState extends State<AppFooter> {
   final Map _languages = {'en': 'English', 'zh_CN': '简体中文'};
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     Locale currentLocal = Localizations.localeOf(context);
     String tmpLocale = currentLocal.languageCode;
     if (currentLocal.countryCode != null) {
       tmpLocale += ('_' + currentLocal.countryCode.toString());
       setState(() {
+        log('init locale : ' + tmpLocale);
         _locale = tmpLocale;
       });
     }
@@ -45,19 +46,17 @@ class _AppFooterState extends State<AppFooter> {
             child: DropdownButton<String>(
           value: _locale,
           onChanged: (newValue) {
-            log('selected : ' + newValue!);
-            var codes = newValue.split('_');
+            var codes = newValue!.split('_');
             Locale newLocale;
             if (codes.length == 1) {
               newLocale = Locale(codes[0]);
             } else {
               newLocale = Locale(codes[0], codes[1]);
             }
-            S.load(newLocale);
             setState(() {
+              S.load(newLocale);
               _locale = newValue;
             });
-            log(_locale);
           },
           items: _languages.entries
               .map((e) =>
