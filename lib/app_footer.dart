@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:nineboot/tools/locale_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'generated/l10n.dart';
 
@@ -53,7 +55,10 @@ class _AppFooterState extends State<AppFooter> {
             } else {
               newLocale = Locale(codes[0], codes[1]);
             }
-            S.load(newLocale);
+
+            final provider =
+            Provider.of<LocaleProvider>(context, listen: false);
+            provider.setLocale(newLocale);
             setState(() {
               _locale = newValue;
             });

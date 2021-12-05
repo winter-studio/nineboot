@@ -6,8 +6,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:nineboot/local_storage.dart';
-import 'package:nineboot/toast_message.dart';
+import 'tools/local_storage.dart';
+import 'tools/toast_message.dart';
 
 import 'generated/l10n.dart';
 
