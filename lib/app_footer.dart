@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nineboot/tools/local_storage.dart';
 import 'package:nineboot/tools/locale_provider.dart';
+import 'package:nineboot/tools/locale_utils.dart';
 import 'package:provider/provider.dart';
 
 class AppFooter extends StatefulWidget {
@@ -42,18 +44,11 @@ class _AppFooterState extends State<AppFooter> {
             child: DropdownButton<String>(
           value: _locale,
           onChanged: (newValue) {
-            var codes = newValue!.split('_');
-            Locale newLocale;
-            if (codes.length == 1) {
-              newLocale = Locale.fromSubtags(languageCode: codes[0]);
-            } else {
-              newLocale = Locale.fromSubtags(
-                  languageCode: codes[0], countryCode: codes[1]);
-            }
-
+            Locale newLocale = LocaleUtils.getLocale(newValue!);
             final provider =
                 Provider.of<LocaleProvider>(context, listen: false);
             provider.setLocale(newLocale);
+            LocalStorage().setLocale(newValue);
             setState(() {
               _locale = newValue;
               log('change to ' + newValue);
