@@ -5,8 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:nineboot/tools/locale_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'generated/l10n.dart';
-
 class AppFooter extends StatefulWidget {
   const AppFooter({Key? key}) : super(key: key);
 
@@ -54,11 +52,10 @@ class _AppFooterState extends State<AppFooter> {
             }
 
             final provider =
-            Provider.of<LocaleProvider>(context, listen: false);
+                Provider.of<LocaleProvider>(context, listen: false);
             provider.setLocale(newLocale);
             setState(() {
               _locale = newValue;
-              S.load(newLocale);
               log('change to ' + newValue);
             });
           },
