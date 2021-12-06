@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:nineboot/tools/locale_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'app_content.dart';
 import 'app_footer.dart';
 import 'app_logo.dart';
 import 'generated/l10n.dart';
-import 'local_storage.dart';
+import 'tools/local_storage.dart';
 
 void main() {
   LocalStorage();
@@ -19,29 +21,35 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      // i18n
-      localizationsDelegates: const [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate
-      ],
-      supportedLocales: S.delegate.supportedLocales,
-      debugShowCheckedModeBanner: false,
-      title: _title,
-      home: SafeArea(
-          child: Scaffold(
-        body: Column(
-          children: [
-            const AppLogo(),
-            const Expanded(child: AppContent()),
-            Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                child: const AppFooter())
-          ],
-        ),
-      )),
-    );
+    return ChangeNotifierProvider(
+        create: (context) => LocaleProvider(),
+        builder: (context, child) {
+          final provider = Provider.of<LocaleProvider>(context);
+          return MaterialApp(
+            // i18n
+            localizationsDelegates: const [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            debugShowCheckedModeBanner: false,
+            title: _title,
+            locale: provider.locale,
+            home: SafeArea(
+                child: Scaffold(
+              body: Column(
+                children: [
+                  const AppLogo(),
+                  const Expanded(child: AppContent()),
+                  Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: const AppFooter())
+                ],
+              ),
+            )),
+          );
+        });
   }
 }
