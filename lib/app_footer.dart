@@ -22,7 +22,6 @@ class _AppFooterState extends State<AppFooter> {
   void initState() {
     super.initState();
     setState(() {
-      log('init locale : ' + Intl.getCurrentLocale());
       _locale = Intl.getCurrentLocale();
     });
   }
