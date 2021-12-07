@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nineboot/tools/rive_controller.dart';
 import 'package:rive/rive.dart';
 
 const assetsImagePath = "assets/images/logo.png";
@@ -58,6 +59,6 @@ class _AppLogoState extends State<AppLogo> {
     final controller = StateMachineController.fromArtboard(artboard, 'press');
     artboard.addController(controller!);
     SMIBool _pressed = controller.findInput<bool>('pressed') as SMIBool;
-    _pressed.value = true;
+    RiveController.init(_pressed);
   }
 }

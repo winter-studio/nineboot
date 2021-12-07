@@ -5,11 +5,12 @@ import 'package:convert/convert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:nineboot/tools/rive_controller.dart';
 
 import 'bluetooth_devices_dialog.dart';
 import 'generated/l10n.dart';
-import 'tools/toast_message.dart';
 import 'tools/local_storage.dart';
+import 'tools/toast_message.dart';
 
 class AppContent extends StatefulWidget {
   const AppContent({Key? key}) : super(key: key);
@@ -34,6 +35,8 @@ class _AppContentState extends State<AppContent> {
       TextEditingController(text: LocalStorage().getAutoConnect());
   bool _isSending = false;
   final FlutterBlue _flutterBlue = FlutterBlue.instance;
+
+  StreamSubscription<List<ScanResult>>? _scanSubscription;
 
   @override
   Widget build(BuildContext context) {
@@ -159,14 +162,24 @@ class _AppContentState extends State<AppContent> {
     if (_device == null &&
         _selectedDeviceId.text == TextEditingValue.empty.text) {
       ToastMessage.error(S.of(context).searchDeviceTip);
+      return;
     }
 
     _updateSendingState(true);
 
     if (_device == null) {
       ToastMessage.info(S.of(context).tryToSearch);
+      log("start scan");
+      // search device by guid
+      await _flutterBlue.startScan(withDevices: [
+        Guid.fromMac(_selectedDeviceId.text)
+      ]).timeout(const Duration(seconds: 10), onTimeout: () {
+        ToastMessage.error(S.of(context).deviceNotFound);
+        _flutterBlue.stopScan();
+      });
 
-      _flutterBlue.scanResults.listen((List<ScanResult> results) {
+      _scanSubscription =
+          _flutterBlue.scanResults.listen((List<ScanResult> results) {
         if (results.toList().isNotEmpty) {
           _flutterBlue.stopScan();
           setState(() {
@@ -174,16 +187,13 @@ class _AppContentState extends State<AppContent> {
           });
         }
       });
-
-      // search device by guid
-      await _flutterBlue.startScan(
-          withDevices: [Guid.fromMac(_selectedDeviceId.text)],
-          timeout: const Duration(seconds: 10));
-
+      log("stop scan");
+      _flutterBlue.stopScan();
+      _scanSubscription?.cancel();
+      _scanSubscription = null;
       if (_device == null) {
         _updateSendingState(false);
         ToastMessage.error(S.of(context).deviceNotFound);
-        _flutterBlue.stopScan();
         return;
       }
     }
@@ -223,6 +233,7 @@ class _AppContentState extends State<AppContent> {
   }
 
   void _updateSendingState(state) {
+    RiveController.pressed(state);
     setState(() {
       _isSending = state;
     });

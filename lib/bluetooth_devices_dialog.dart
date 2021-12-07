@@ -6,10 +6,10 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'tools/local_storage.dart';
-import 'tools/toast_message.dart';
 
 import 'generated/l10n.dart';
+import 'tools/local_storage.dart';
+import 'tools/toast_message.dart';
 
 class BluetoothDevicesDialog extends StatefulWidget {
   const BluetoothDevicesDialog({Key? key}) : super(key: key);
@@ -49,7 +49,7 @@ class _BluetoothListState extends State<BluetoothDevicesDialog> {
     _isScanning?.listen((event) {
       if (event != _isLoading && mounted) {
         setState(() {
-          log(event.toString());
+          log("_isScanning : " + event.toString());
           _isLoading = event;
         });
       }
